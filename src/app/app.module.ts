@@ -12,6 +12,7 @@ import {StarsComponent} from './stars/stars.component';
 import {RouterModule, Routes} from "@angular/router";
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {StockFormComponent} from './stock/stock-form/stock-form.component';
+import {StockService} from "./stock/stock.service";
 
 const routeConfig: Routes = [
   {
@@ -45,7 +46,7 @@ const routeConfig: Routes = [
     BrowserModule,
     RouterModule.forRoot(routeConfig)
   ],
-  providers: [],
+  providers: [StockService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
