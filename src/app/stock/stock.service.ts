@@ -25,7 +25,7 @@ export class StockService {
     if (id != 0) {
       return this.stocks.find(stock => stock.id == id);
     } else {
-      new Stock(0, "", 0, 0, "", []);
+      return new Stock(0, "", 0, 0, "", []);
     }
   }
 
