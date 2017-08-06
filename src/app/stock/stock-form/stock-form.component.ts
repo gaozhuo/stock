@@ -8,6 +8,7 @@ import {
 } from "@angular/forms";
 import {ValidateFn} from "codelyzer/walkerFactory/walkerFn";
 import {log} from "util";
+import {Observable} from "rxjs/Observable";
 
 @Component({
   selector: 'app-stock-form',
@@ -15,7 +16,7 @@ import {log} from "util";
   styleUrls: ['./stock-form.component.css']
 })
 export class StockFormComponent implements OnInit {
-  stock: Stock;
+  stock: Stock = new Stock(0, "", 0, 0, "", []);
   formModule: FormGroup;
   categories = ['IT', '互联网', '金融'];
 
@@ -23,40 +24,46 @@ export class StockFormComponent implements OnInit {
               private stockService: StockService,
               private router: Router,
               private fb: FormBuilder) {
+    this.createForm();
+
   }
+
 
   ngOnInit() {
     let stockId = this.route.snapshot.params['id'];
 
-    this.stock = this.stockService.getStock(stockId);
+    this.stockService.getStock(stockId).subscribe(data => {
+      this.stock = data;
 
-    this.createForm();
+      this.resetForm();
+    });
+
+
   }
 
   private resetForm() {
     this.formModule.reset({
-      name: [this.stock.name],
-      price: [this.stock.price],
-      desc: [this.stock.desc],
-      categories: this.fb.array(
-        [
-          new FormControl(this.stock.categories.indexOf(this.categories[0]) != -1),
-          new FormControl(this.stock.categories.indexOf(this.categories[1]) != -1),
-          new FormControl(this.stock.categories.indexOf(this.categories[2]) != -1)
-        ])
+      name: this.stock.name,
+      price: this.stock.price,
+      desc: this.stock.desc,
+      categories: [
+        this.stock.categories.indexOf(this.categories[0]) != -1,
+        this.stock.categories.indexOf(this.categories[1]) != -1,
+        this.stock.categories.indexOf(this.categories[2]) != -1,
+      ]
     })
   }
 
   private createForm() {
     this.formModule = this.fb.group({
-      name: [this.stock.name, [Validators.required, Validators.minLength(3)]],
-      price: [this.stock.price, Validators.required],
-      desc: [this.stock.desc],
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      price: ['', Validators.required],
+      desc: [''],
       categories: this.fb.array(
         [
-          new FormControl(this.stock.categories.indexOf(this.categories[0]) != -1),
-          new FormControl(this.stock.categories.indexOf(this.categories[1]) != -1),
-          new FormControl(this.stock.categories.indexOf(this.categories[2]) != -1)
+          new FormControl(false),
+          new FormControl(false),
+          new FormControl(false)
         ], this.categoriesSelectValidators)
     })
   }
